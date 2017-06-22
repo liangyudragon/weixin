@@ -11,5 +11,5 @@ public interface MessageCallback {
 	 * 收到私聊消息后的回调
 	 * @param message
 	 */
-	void onMessage(String message);
+	void onMessage(Message message);
 }

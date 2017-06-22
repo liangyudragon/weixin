@@ -130,6 +130,23 @@
             <artifactId>emoji-java</artifactId>
             <version>3.2.0</version>
         </dependency>
+        <!-- JSON begin -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>2.3.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.3.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.module</groupId>
+            <artifactId>jackson-module-jaxb-annotations</artifactId>
+            <version>2.3.1</version>
+        </dependency>
+        <!-- JSON end -->
     </dependencies>
     <build>
         <plugins>

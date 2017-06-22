@@ -20,8 +20,7 @@ import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.util.*;
 import java.util.regex.Matcher;
-
-import com.sun.tools.corba.se.idl.som.cff.Messages;
+import com.tramp.wechat4j.utils.JSONUtils;
 import com.tramp.wechat4j.wechat.entity.Message;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
@@ -37,6 +36,7 @@ import com.tramp.wechat4j.wechat.callback.MessageCallback;
 import com.tramp.wechat4j.wechat.enums.*;
 import com.tramp.wechat4j.wechat.utils.CommonTools;
 import com.tramp.wechat4j.wechat.utils.HttpClientUtil;
+import com.tramp.wechat4j.wechat.utils.LoginUtil;
 import com.tramp.wechat4j.wechat.utils.SleepUtils;
 
 /**
@@ -46,7 +46,7 @@ import com.tramp.wechat4j.wechat.utils.SleepUtils;
 public class WechatClient {
 	private static final Logger LOG = LoggerFactory.getLogger(WechatClient.class);
 	private HttpClientUtil httpClientUtil = new HttpClientUtil();
-
+	private MessageCallback messageCallback;
 	private String qrPath = "C:\\Users\\chenjm1\\Desktop";
 	boolean alive = false;
 	private int memberCount = 0;
@@ -70,18 +70,19 @@ public class WechatClient {
 	private long lastNormalRetcodeTime; // 最后一次收到正常retcode的时间，秒为单位
 
 	public WechatClient(final MessageCallback callback) {
-		System.setProperty("jsse.enableSNIExtension", "false"); // 防止SSL错误
-		login();
 		if (callback != null) {
-			new Thread(new Runnable() {
+			System.setProperty("jsse.enableSNIExtension", "false"); // 防止SSL错误
+			this.messageCallback = callback;
+			login();
+			/*new Thread(new Runnable() {
 				public void run() {
 					while (true) {
-                        if(alive){
-                            //callback.onMessage("11111");
-                        }
+						if (alive) {
+							callback.onMessage(null);
+						}
 					}
 				}
-			}).start();
+			}).start();*/
 		}
 	}
 
@@ -102,10 +103,38 @@ public class WechatClient {
 			if (this.getQR()) {
 				LOG.info("3. 请扫描二维码图片，并在手机上确认");
 				if (!this.alive) {
-					wLogin();
-					alive = true;
-					LOG.info(("登陆成功"));
-					break;
+					if (wLogin()) {
+						alive = true;
+						LOG.info("5. 登陆成功，微信初始化");
+						if (!LoginUtil.webWxInit(this)) {
+							LOG.info("6. 微信初始化异常");
+							//System.exit(0);
+						}
+
+						LOG.info("6.开启微信状态检测线程");
+						//new Thread(new CheckLoginStatusThread()).start();
+
+						LOG.info("7. 开启微信状态通知");
+						LoginUtil.wxStatusNotify(this);
+
+						LOG.info("8. 清除。。。。");
+						CommonTools.clearScreen();
+						LOG.info(String.format("欢迎回来， %s", this.getNickName()));
+
+						LOG.info("9. 开始接收消息");
+						LoginUtil.startReceiving(this);
+
+						LOG.info("10. 获取联系人信息");
+						LoginUtil.webWxGetContact(this);
+
+						LOG.info("11. 缓存本次登陆好友相关消息");
+						for (JSONObject o : this.getContactList()) {
+							this.getUserInfoMap().put(o.getString("NickName"), o);
+							this.getUserInfoMap().put(o.getString("UserName"), o);
+						} // 登陆成功后缓存本次登陆好友相关消息（NickName, UserName）
+
+						break;
+					}
 				}
 				LOG.info("4. 登陆超时，请重新扫描二维码图片");
 				break;
@@ -296,6 +325,26 @@ public class WechatClient {
 		return null;
 	}
 
+	/**
+	 * 请求参数
+	 */
+	public Map<String, Object> getParamMap() {
+		return new HashMap<String, Object>(1) {
+			/**
+			 *
+			 */
+			private static final long serialVersionUID = 1L;
+
+			{
+				Map<String, String> map = new HashMap<String, String>();
+				for (BaseParaEnum baseRequest : BaseParaEnum.values()) {
+					map.put(baseRequest.para(), getLoginInfo().get(baseRequest.value()).toString());
+				}
+				put("BaseRequest", map);
+			}
+		};
+	}
+
 	private Map<String, List<String>> getPossibleUrlMap() {
 		Map<String, List<String>> possibleUrlMap = new HashMap<String, List<String>>();
 		possibleUrlMap.put("wx.qq.com", new ArrayList<String>() {
@@ -358,131 +407,196 @@ public class WechatClient {
 		return possibleUrlMap;
 	}
 
-    public String getQrPath() {
-        return qrPath;
-    }
+	public String getQrPath() {
+		return qrPath;
+	}
 
-    public void setQrPath(String qrPath) {
-        this.qrPath = qrPath;
-    }
+	public void setQrPath(String qrPath) {
+		this.qrPath = qrPath;
+	}
 
-    public boolean isAlive() {
-        return alive;
-    }
+	public boolean isAlive() {
+		return alive;
+	}
 
-    public void setAlive(boolean alive) {
-        this.alive = alive;
-    }
+	public void setAlive(boolean alive) {
+		this.alive = alive;
+	}
 
-    public int getMemberCount() {
-        return memberCount;
-    }
+	public int getMemberCount() {
+		return memberCount;
+	}
 
-    public void setMemberCount(int memberCount) {
-        this.memberCount = memberCount;
-    }
+	public void setMemberCount(int memberCount) {
+		this.memberCount = memberCount;
+	}
 
-    public String getUserName() {
-        return userName;
-    }
+	public String getUserName() {
+		return userName;
+	}
 
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
 
-    public String getNickName() {
-        return nickName;
-    }
+	public String getNickName() {
+		return nickName;
+	}
 
-    public void setNickName(String nickName) {
-        this.nickName = nickName;
-    }
+	public void setNickName(String nickName) {
+		this.nickName = nickName;
+	}
 
-    public JSONObject getUserSelf() {
-        return userSelf;
-    }
+	public JSONObject getUserSelf() {
+		return userSelf;
+	}
 
-    public void setUserSelf(JSONObject userSelf) {
-        this.userSelf = userSelf;
-    }
+	public void setUserSelf(JSONObject userSelf) {
+		this.userSelf = userSelf;
+	}
 
-    public List<JSONObject> getMemberList() {
-        return memberList;
-    }
+	public List<JSONObject> getMemberList() {
+		return memberList;
+	}
 
-    public void setMemberList(List<JSONObject> memberList) {
-        this.memberList = memberList;
-    }
+	public void setMemberList(List<JSONObject> memberList) {
+		this.memberList = memberList;
+	}
 
-    public List<JSONObject> getContactList() {
-        return contactList;
-    }
+	public List<JSONObject> getContactList() {
+		return contactList;
+	}
 
-    public void setContactList(List<JSONObject> contactList) {
-        this.contactList = contactList;
-    }
+	public void setContactList(List<JSONObject> contactList) {
+		this.contactList = contactList;
+	}
 
-    public List<JSONObject> getGroupList() {
-        return groupList;
-    }
+	public List<JSONObject> getGroupList() {
+		return groupList;
+	}
 
-    public void setGroupList(List<JSONObject> groupList) {
-        this.groupList = groupList;
-    }
+	public void setGroupList(List<JSONObject> groupList) {
+		this.groupList = groupList;
+	}
 
-    public List<JSONObject> getGroupMemeberList() {
-        return groupMemeberList;
-    }
+	public List<JSONObject> getGroupMemeberList() {
+		return groupMemeberList;
+	}
 
-    public void setGroupMemeberList(List<JSONObject> groupMemeberList) {
-        this.groupMemeberList = groupMemeberList;
-    }
+	public void setGroupMemeberList(List<JSONObject> groupMemeberList) {
+		this.groupMemeberList = groupMemeberList;
+	}
 
-    public List<JSONObject> getPublicUsersList() {
-        return publicUsersList;
-    }
+	public List<JSONObject> getPublicUsersList() {
+		return publicUsersList;
+	}
 
-    public void setPublicUsersList(List<JSONObject> publicUsersList) {
-        this.publicUsersList = publicUsersList;
-    }
+	public void setPublicUsersList(List<JSONObject> publicUsersList) {
+		this.publicUsersList = publicUsersList;
+	}
 
-    public List<JSONObject> getSpecialUsersList() {
-        return specialUsersList;
-    }
+	public List<JSONObject> getSpecialUsersList() {
+		return specialUsersList;
+	}
 
-    public void setSpecialUsersList(List<JSONObject> specialUsersList) {
-        this.specialUsersList = specialUsersList;
-    }
+	public void setSpecialUsersList(List<JSONObject> specialUsersList) {
+		this.specialUsersList = specialUsersList;
+	}
 
-    public List<String> getGroupIdList() {
-        return groupIdList;
-    }
+	public List<String> getGroupIdList() {
+		return groupIdList;
+	}
 
-    public void setGroupIdList(List<String> groupIdList) {
-        this.groupIdList = groupIdList;
-    }
+	public void setGroupIdList(List<String> groupIdList) {
+		this.groupIdList = groupIdList;
+	}
 
-    public Map<String, JSONObject> getUserInfoMap() {
-        return userInfoMap;
-    }
+	public Map<String, JSONObject> getUserInfoMap() {
+		return userInfoMap;
+	}
 
-    public void setUserInfoMap(Map<String, JSONObject> userInfoMap) {
-        this.userInfoMap = userInfoMap;
-    }
+	public void setUserInfoMap(Map<String, JSONObject> userInfoMap) {
+		this.userInfoMap = userInfoMap;
+	}
 
-    public Map<String, Object> getLoginInfo() {
-        return loginInfo;
-    }
+	public Map<String, Object> getLoginInfo() {
+		return loginInfo;
+	}
 
-    public void setLoginInfo(Map<String, Object> loginInfo) {
-        this.loginInfo = loginInfo;
-    }
+	public void setLoginInfo(Map<String, Object> loginInfo) {
+		this.loginInfo = loginInfo;
+	}
+	public List<JSONObject> getMsgList() {
+		return msgList;
+	}
 
-    public static void main(String[] args) {
-        WechatClient client = new WechatClient(new MessageCallback() {
-            public void onMessage(String message) {
-                System.out.println(message);
-            }
-        });
-    }
+	public void setMsgList(List<JSONObject> msgList) {
+		this.msgList = msgList;
+	}
+
+	public void setUuid(String uuid) {
+		this.uuid = uuid;
+	}
+
+	public boolean isUseHotReload() {
+		return useHotReload;
+	}
+
+	public void setUseHotReload(boolean useHotReload) {
+		this.useHotReload = useHotReload;
+	}
+
+	public String getHotReloadDir() {
+		return hotReloadDir;
+	}
+
+	public void setHotReloadDir(String hotReloadDir) {
+		this.hotReloadDir = hotReloadDir;
+	}
+
+	public int getReceivingRetryCount() {
+		return receivingRetryCount;
+	}
+
+	public void setReceivingRetryCount(int receivingRetryCount) {
+		this.receivingRetryCount = receivingRetryCount;
+	}
+
+	public long getLastNormalRetcodeTime() {
+		return lastNormalRetcodeTime;
+	}
+
+	public void setLastNormalRetcodeTime(long lastNormalRetcodeTime) {
+		this.lastNormalRetcodeTime = lastNormalRetcodeTime;
+	}
+
+	public HttpClientUtil getHttpClientUtil() {
+		return httpClientUtil;
+	}
+
+	public void setHttpClientUtil(HttpClientUtil httpClientUtil) {
+		this.httpClientUtil = httpClientUtil;
+	}
+
+	public MessageCallback getMessageCallback() {
+		return messageCallback;
+	}
+
+	public void setMessageCallback(MessageCallback messageCallback) {
+		this.messageCallback = messageCallback;
+	}
+
+	public static void main(String[] args) {
+		WechatClient client = new WechatClient(new MessageCallback() {
+			public void onMessage(Message message) {
+				System.out.println(JSONUtils.toJson(message));
+			}
+		});
+		//联系人
+		List<JSONObject> contactList = client.getContactList();
+		for (JSONObject jsonObject : contactList) {
+			System.out.println(JSONUtils.toJson(jsonObject));
+		}
+
+	}
 }
