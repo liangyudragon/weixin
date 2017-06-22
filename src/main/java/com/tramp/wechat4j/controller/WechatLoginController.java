@@ -2,9 +2,11 @@ package com.tramp.wechat4j.controller;
 
 import com.alibaba.fastjson.JSONArray;
 import com.google.common.collect.Maps;
+import com.tramp.wechat4j.wechat.bot.TuringQueryService;
 import com.tramp.wechat4j.wechat.callback.MessageCallback;
 import com.tramp.wechat4j.wechat.client.WechatClient;
 import com.tramp.wechat4j.wechat.entity.Message;
+import com.tramp.wechat4j.wechat.utils.MessageUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,8 +31,11 @@ public class WechatLoginController extends BaseController {
         result.put("code", 201);
 
         WechatClient wechatClient = new WechatClient(new MessageCallback() {
-            public void onMessage(Message message) {
-                //消息处理
+            public void onFriendMessage(Message message) {
+
+            }
+
+            public void onGroupMessage(Message message) {
 
             }
         });

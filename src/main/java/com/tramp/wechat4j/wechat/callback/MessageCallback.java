@@ -11,5 +11,11 @@ public interface MessageCallback {
 	 * 收到私聊消息后的回调
 	 * @param message
 	 */
-	void onMessage(Message message);
+	void onFriendMessage(Message message);
+
+	/**
+	 * 群消息回调
+	 * @param message
+	 */
+	void onGroupMessage(Message message);
 }

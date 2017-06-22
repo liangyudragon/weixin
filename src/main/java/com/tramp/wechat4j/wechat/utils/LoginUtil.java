@@ -3,10 +3,9 @@ package com.tramp.wechat4j.wechat.utils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.tramp.wechat4j.utils.JSONUtils;
 import com.tramp.wechat4j.wechat.Config;
 import com.tramp.wechat4j.wechat.client.WechatClient;
-import com.tramp.wechat4j.wechat.entity.Message;
+import com.tramp.wechat4j.wechat.entity.*;
 import com.tramp.wechat4j.wechat.enums.*;
 import org.apache.http.Consts;
 import org.apache.http.HttpEntity;
@@ -69,7 +68,7 @@ public class LoginUtil {
                 JSONObject o = contactListArray.getJSONObject(i);
                 if (o.getString("UserName").indexOf("@@") != -1) {
                     wechatClient.getGroupIdList().add(o.getString("UserName")); // 更新GroupIdList
-                    wechatClient.getGroupList().add(o); // 更新GroupList
+                    wechatClient.getGroupList().add(JSON.parseObject(JSONObject.toJSONString(o), Group.class)); // 更新GroupList
                 }
             }
 
@@ -105,9 +104,11 @@ public class LoginUtil {
         wechatClient.setAlive(true);
         new Thread(new Runnable() {
             int retryCount = 0;
+
             public void run() {
                 while (wechatClient.isAlive()) {
                     try {
+                        SleepUtils.sleep(500);
                         Map<String, String> resultMap = syncCheck(wechatClient);
                         LOG.info(JSONObject.toJSONString(resultMap));
                         String retcode = resultMap.get("retcode");
@@ -132,10 +133,8 @@ public class LoginUtil {
                                     try {
                                         JSONArray msgList = msgObj.getJSONArray("AddMsgList");
                                         for (Object o : msgList) {
-                                            System.out.println("===="+"\""+o.toString()+"\"");
-                                            Message message = JSONUtils.fromJson("\""+o.toString()+"\"", Message.class);
-                                            wechatClient.getMessageCallback().onMessage(message);
-
+                                            Message message = JSON.parseObject(JSONObject.toJSONString(o), Message.class);
+                                            msgTypeDone(wechatClient, message);
                                         }
                                     } catch (Exception e) {
                                         LOG.info(e.getMessage());
@@ -172,12 +171,85 @@ public class LoginUtil {
     }
 
     /**
+     * 消息分类处理
+     *
+     * @param wechatClient
+     * @param message
+     */
+    private static void msgTypeDone(WechatClient wechatClient, Message message) {
+
+        message.setGroupMsg(false);
+        if (message.getFromUserName().contains("@@") || message.getToUserName().contains("@@")) { // 群聊消息
+            if (message.getFromUserName().contains("@@")
+                    && !wechatClient.getGroupIdList().contains(message.getFromUserName())) {
+                wechatClient.getGroupIdList().add((message.getFromUserName()));
+            } else if (message.getToUserName().contains("@@")
+                    && !wechatClient.getGroupIdList().contains(message.getToUserName())) {
+                wechatClient.getGroupIdList().add((message.getToUserName()));
+            }
+            // 群消息与普通消息不同的是在其消息体（Content）中会包含发送者id及":<br/>"消息，这里需要处理一下，去掉多余信息，只保留消息内容
+            if (message.getContent().contains("<br/>")) {
+                String content = message.getContent().substring(message.getContent().indexOf("<br/>") + 5);
+                message.setContent(content);
+                message.setGroupMsg(true);
+            }
+        } else {
+            // CommonTools.msgFormatter(m, "Content");
+        }
+        if (message.getMsgType().equals(MsgCodeEnum.MSGTYPE_TEXT.getCode())) { // words
+            message.setType(MsgCodeEnum.MSGTYPE_TEXT.getType());
+            if (message.getUrl().length() != 0) {
+                String regEx = "(.+?\\(.+?\\))";
+                Matcher matcher = CommonTools.getMatcher(regEx, message.getContent());
+                String data = "Map";
+                if (matcher.find()) {
+                    data = matcher.group(1);
+                }
+            } else {
+                message.setContent(message.getContent());
+            }
+        } else if (message.getMsgType().equals(MsgCodeEnum.MSGTYPE_IMAGE.getCode())
+                || message.getMsgType().equals(MsgCodeEnum.MSGTYPE_EMOTICON.getCode())) { // 图片消息
+            message.setType(MsgCodeEnum.MSGTYPE_IMAGE.getType());
+        } else if (message.getMsgType().equals(MsgCodeEnum.MSGTYPE_VOICE.getCode())) { // 语音消息
+            message.setType(MsgCodeEnum.MSGTYPE_IMAGE.getType());
+
+        } else if (message.getMsgType().equals(MsgCodeEnum.MSGTYPE_VERIFYMSG.getCode())) {// friends
+            // 好友确认消息
+
+        } else if (message.getMsgType().equals(MsgCodeEnum.MSGTYPE_SHARECARD.getCode())) { // 共享名片
+            message.setType(MsgCodeEnum.MSGTYPE_SHARECARD.getType());
+        } else if (message.getMsgType().equals(MsgCodeEnum.MSGTYPE_VIDEO.getCode())
+                || message.getMsgType().equals(MsgCodeEnum.MSGTYPE_MICROVIDEO.getCode())) {// viedo
+            message.setType(MsgCodeEnum.MSGTYPE_VIDEO.getType());
+        } else if (message.getMsgType().equals(MsgCodeEnum.MSGTYPE_APP.getCode())) { // sharing
+            // 分享链接
+
+        } else if (message.getMsgType().equals(MsgCodeEnum.MSGTYPE_STATUSNOTIFY.getCode())) {// phone
+            // init
+            // 微信初始化消息
+
+        } else if (message.getMsgType().equals(MsgCodeEnum.MSGTYPE_SYS.getCode())) {// 系统消息
+
+        } else if (message.getMsgType().equals(MsgCodeEnum.MSGTYPE_RECALLED.getCode())) { // 撤回消息
+
+        } else {
+            LOG.info("Useless msg");
+        }
+        if (message.getGroupMsg()) {
+            wechatClient.getMessageCallback().onGroupMessage(message);
+        } else {
+            wechatClient.getMessageCallback().onFriendMessage(message);
+
+        }
+    }
+
+    /**
      * 检查是否有新消息 check whether there's a message
      *
+     * @return
      * @author https://github.com/yaphone
      * @date 2017年4月16日 上午11:11:34
-     * @return
-     *
      */
     private static Map<String, String> syncCheck(WechatClient wechatClient) {
         Map<String, String> resultMap = new HashMap<String, String>();
@@ -217,9 +289,9 @@ public class LoginUtil {
     /**
      * 同步消息 sync the messages
      *
+     * @return
      * @author https://github.com/yaphone
      * @date 2017年5月12日 上午12:24:55
-     * @return
      */
     private static JSONObject webWxSync(WechatClient wechatClient) {
         JSONObject result = null;
@@ -301,21 +373,21 @@ public class LoginUtil {
                 member.addAll(fullFriendsJsonList.getJSONArray(StorageLoginInfoEnum.MemberList.getKey()));
             }
             wechatClient.setMemberCount(member.size());
-            for (Iterator<?> iterator = member.iterator(); iterator.hasNext();) {
+            for (Iterator<?> iterator = member.iterator(); iterator.hasNext(); ) {
                 JSONObject o = (JSONObject) iterator.next();
                 if ((o.getInteger("VerifyFlag") & 8) != 0) { // 公众号/服务号
-                    wechatClient.getPublicUsersList().add(o);
+                    wechatClient.getPublicUsersList().add(JSON.parseObject(JSONObject.toJSONString(o), PublicUser.class));
                 } else if (Config.API_SPECIAL_USER.contains(o.getString("UserName"))) { // 特殊账号
-                    wechatClient.getSpecialUsersList().add(o);
+                    wechatClient.getSpecialUsersList().add(JSON.parseObject(JSONObject.toJSONString(o), SpecialUser.class));
                 } else if (o.getString("UserName").indexOf("@@") != -1) { // 群聊
                     if (!wechatClient.getGroupIdList().contains(o.getString("UserName"))) {
                         wechatClient.getGroupIdList().add(o.getString("UserName"));
-                        wechatClient.getGroupList().add(o);
+                        wechatClient.getGroupList().add(JSON.parseObject(JSONObject.toJSONString(o), Group.class));
                     }
                 } else if (o.getString("UserName").equals(wechatClient.getUserSelf().getString("UserName"))) { // 自己
-                    wechatClient.getContactList().remove(o);
+                    wechatClient.getFriendList().remove(JSON.parseObject(JSONObject.toJSONString(o), Friend.class));
                 } else { // 普通联系人
-                    wechatClient.getContactList().add(o);
+                    wechatClient.getFriendList().add(JSON.parseObject(JSONObject.toJSONString(o), Friend.class));
                 }
             }
             return;

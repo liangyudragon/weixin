@@ -8,32 +8,50 @@ import com.alibaba.fastjson.JSONObject;
  */
 public class Message {
     private String MsgId;
-    private Integer ForwardFlag;
+    private String ForwardFlag;
     private String NewMsgId;
     private RecommendInfo RecommendInfo;
-    private Integer VoiceLength;
+    private String VoiceLength;
     private Integer MsgType;
     private String OriContent;
     private String Ticket;
     private String Url;
     private AppInfo AppInfo;
-    private Integer SubMsgType;
+    private String SubMsgType;
     private String Content;
-    private Integer AppMsgType;
-    private Integer ImgWidth;
-    private Integer PlayLength;
-    private Integer StatusNotifyCode;
+    private String AppMsgType;
+    private String ImgWidth;
+    private String PlayLength;
+    private String StatusNotifyCode;
     private String StatusNotifyUserName;
-    private Integer HasProductId;
+    private String HasProductId;
     private String MediaId;
     private String ToUserName;
     private String FileSize;
-    private Integer Status;
+    private String Status;
     private String FromUserName;
-    private Integer ImgHeight;
-    private Integer ImgStatus;
+    private String ImgHeight;
+    private String ImgStatus;
     private String FileName;
     private Long CreateTime;
+    private Boolean groupMsg;
+    private String type;
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public Boolean getGroupMsg() {
+        return groupMsg;
+    }
+
+    public void setGroupMsg(Boolean groupMsg) {
+        this.groupMsg = groupMsg;
+    }
 
     public String getMsgId() {
         return MsgId;
@@ -59,11 +77,11 @@ public class Message {
         RecommendInfo = recommendInfo;
     }
 
-    public Integer getVoiceLength() {
+    public String getVoiceLength() {
         return VoiceLength;
     }
 
-    public void setVoiceLength(Integer voiceLength) {
+    public void setVoiceLength(String voiceLength) {
         VoiceLength = voiceLength;
     }
 
@@ -107,11 +125,11 @@ public class Message {
         AppInfo = appInfo;
     }
 
-    public Integer getSubMsgType() {
+    public String getSubMsgType() {
         return SubMsgType;
     }
 
-    public void setSubMsgType(Integer subMsgType) {
+    public void setSubMsgType(String subMsgType) {
         SubMsgType = subMsgType;
     }
 
@@ -123,35 +141,35 @@ public class Message {
         Content = content;
     }
 
-    public Integer getAppMsgType() {
+    public String getAppMsgType() {
         return AppMsgType;
     }
 
-    public void setAppMsgType(Integer appMsgType) {
+    public void setAppMsgType(String appMsgType) {
         AppMsgType = appMsgType;
     }
 
-    public Integer getImgWidth() {
+    public String getImgWidth() {
         return ImgWidth;
     }
 
-    public void setImgWidth(Integer imgWidth) {
+    public void setImgWidth(String imgWidth) {
         ImgWidth = imgWidth;
     }
 
-    public Integer getPlayLength() {
+    public String getPlayLength() {
         return PlayLength;
     }
 
-    public void setPlayLength(Integer playLength) {
+    public void setPlayLength(String playLength) {
         PlayLength = playLength;
     }
 
-    public Integer getStatusNotifyCode() {
+    public String getStatusNotifyCode() {
         return StatusNotifyCode;
     }
 
-    public void setStatusNotifyCode(Integer statusNotifyCode) {
+    public void setStatusNotifyCode(String statusNotifyCode) {
         StatusNotifyCode = statusNotifyCode;
     }
 
@@ -163,11 +181,11 @@ public class Message {
         StatusNotifyUserName = statusNotifyUserName;
     }
 
-    public Integer getHasProductId() {
+    public String getHasProductId() {
         return HasProductId;
     }
 
-    public void setHasProductId(Integer hasProductId) {
+    public void setHasProductId(String hasProductId) {
         HasProductId = hasProductId;
     }
 
@@ -195,11 +213,11 @@ public class Message {
         FileSize = fileSize;
     }
 
-    public Integer getStatus() {
+    public String getStatus() {
         return Status;
     }
 
-    public void setStatus(Integer status) {
+    public void setStatus(String status) {
         Status = status;
     }
 
@@ -211,19 +229,19 @@ public class Message {
         FromUserName = fromUserName;
     }
 
-    public Integer getImgHeight() {
+    public String getImgHeight() {
         return ImgHeight;
     }
 
-    public void setImgHeight(Integer imgHeight) {
+    public void setImgHeight(String imgHeight) {
         ImgHeight = imgHeight;
     }
 
-    public Integer getImgStatus() {
+    public String getImgStatus() {
         return ImgStatus;
     }
 
-    public void setImgStatus(Integer imgStatus) {
+    public void setImgStatus(String imgStatus) {
         ImgStatus = imgStatus;
     }
 
@@ -244,14 +262,14 @@ public class Message {
     }
 
     public class AppInfo{
-        private Integer Type;
+        private String Type;
         private String AppID;
 
-        public Integer getType() {
+        public String getType() {
             return Type;
         }
 
-        public void setType(Integer type) {
+        public void setType(String type) {
             Type = type;
         }
 
@@ -264,26 +282,26 @@ public class Message {
         }
     }
     public class RecommendInfo{
-        private Integer VerifyFlag;
+        private String VerifyFlag;
         private String NickName;
-        private Integer Scene;
+        private String Scene;
         private String UserName;
-        private Integer QQNum;
+        private String QQNum;
         private String Province;
         private String City;
         private String Signature;
-        private Integer OpCode;
+        private String OpCode;
         private String Ticket;
         private String Alias;
-        private Integer AttrStatus;
-        private Integer Sex;
+        private String AttrStatus;
+        private String Sex;
         private String Content;
 
-        public Integer getVerifyFlag() {
+        public String getVerifyFlag() {
             return VerifyFlag;
         }
 
-        public void setVerifyFlag(Integer verifyFlag) {
+        public void setVerifyFlag(String verifyFlag) {
             VerifyFlag = verifyFlag;
         }
 
@@ -295,11 +313,11 @@ public class Message {
             NickName = nickName;
         }
 
-        public Integer getScene() {
+        public String getScene() {
             return Scene;
         }
 
-        public void setScene(Integer scene) {
+        public void setScene(String scene) {
             Scene = scene;
         }
 
@@ -311,11 +329,11 @@ public class Message {
             UserName = userName;
         }
 
-        public Integer getQQNum() {
+        public String getQQNum() {
             return QQNum;
         }
 
-        public void setQQNum(Integer QQNum) {
+        public void setQQNum(String QQNum) {
             this.QQNum = QQNum;
         }
 
@@ -343,11 +361,11 @@ public class Message {
             Signature = signature;
         }
 
-        public Integer getOpCode() {
+        public String getOpCode() {
             return OpCode;
         }
 
-        public void setOpCode(Integer opCode) {
+        public void setOpCode(String opCode) {
             OpCode = opCode;
         }
 
@@ -367,19 +385,19 @@ public class Message {
             Alias = alias;
         }
 
-        public Integer getAttrStatus() {
+        public String getAttrStatus() {
             return AttrStatus;
         }
 
-        public void setAttrStatus(Integer attrStatus) {
+        public void setAttrStatus(String attrStatus) {
             AttrStatus = attrStatus;
         }
 
-        public Integer getSex() {
+        public String getSex() {
             return Sex;
         }
 
-        public void setSex(Integer sex) {
+        public void setSex(String sex) {
             Sex = sex;
         }
 
@@ -392,11 +410,11 @@ public class Message {
         }
     }
 
-    public Integer getForwardFlag() {
+    public String getForwardFlag() {
         return ForwardFlag;
     }
 
-    public void setForwardFlag(Integer forwardFlag) {
+    public void setForwardFlag(String forwardFlag) {
         ForwardFlag = forwardFlag;
     }
 }
