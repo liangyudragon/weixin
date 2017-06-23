@@ -8,12 +8,5 @@
 out
 gen
 *.gitignore
-src/main/java/com/tramp/wechat4j/dao/
-src/main/java/com/tramp/wechat4j/entity/
-src/main/java/com/tramp/wechat4j/interceptor/
-src/main/java/com/tramp/wechat4j/service/
-src/main/java/com/tramp/wechat4j/utils/
-src/main/java/com/tramp/wechat4j/wechat/contants/
-src/main/java/com/tramp/wechat4j/wechat/service/
 src/test/
 target/
