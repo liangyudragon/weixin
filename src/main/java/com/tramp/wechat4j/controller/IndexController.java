@@ -5,7 +5,16 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import com.tramp.wechat4j.wechat.client.WechatClient;
+import com.tramp.wechat4j.wechat.contants.Contants;
+import com.tramp.wechat4j.wechat.entity.Friend;
+import com.tramp.wechat4j.wechat.entity.WechatInfo;
+import com.tramp.wechat4j.wechat.utils.CommonTools;
+import com.tramp.wechat4j.wechat.utils.LoginUtil;
+import com.tramp.wechat4j.wechat.utils.SleepUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,6 +25,7 @@ import com.google.common.collect.Maps;
 @Controller
 @RequestMapping("/index/*")
 public class IndexController extends BaseController {
+	private static final Logger LOG = LoggerFactory.getLogger(IndexController.class);
 
 	@RequestMapping("loginPage.do")
 	public String loginPage(HttpServletRequest request, ModelMap modelMap) {
@@ -65,6 +75,40 @@ public class IndexController extends BaseController {
 
 	@RequestMapping("main.do")
 	public String main(HttpServletRequest request, ModelMap modelMap) {
+		WechatInfo info = Contants.WECHAT_MAP.get(Contants.WECHAT_MAP_KEY);
+		if (info ==null ){
+			WechatClient wechatClient = new WechatClient();
+			//获取uuid
+			LOG.info("获取UUID");
+			for (int count = 0; count < 10; count++) {
+				while (StringUtils.isEmpty(wechatClient.getUid())) {
+					LOG.info("1. 获取微信UUID");
+					String uuid = wechatClient.getUuid();
+					wechatClient.setUuid(uuid);
+					if (StringUtils.isEmpty(uuid)) {
+						LOG.warn("1.1. 获取微信UUID失败，两秒后重新获取");
+					}else {
+						LOG.info("获取登陆二维码图片");
+						String qrName = System.currentTimeMillis()+".jpg";
+						String path = request.getSession().getServletContext().getRealPath("/");
+						if (wechatClient.getQR(path,qrName)) {
+							LOG.info("请扫描二维码图片，并在手机上确认:" + path+qrName);
+							modelMap.put("qrPath", qrName);
+						} else if (count == 10) {
+							LOG.error("2.2. 获取登陆二维码图片失败");
+							break;
+						}
+					}
+					SleepUtils.sleep(2000);
+				}
+			}
+			WechatInfo wechatInfo = new WechatInfo();
+			wechatInfo.setWechatClient(wechatClient);
+			Contants.WECHAT_MAP.put(Contants.WECHAT_MAP_KEY, wechatInfo);
+		}else {
+			modelMap.put("loginFlag", "1");
+
+		}
 
 		return "main";
 	}

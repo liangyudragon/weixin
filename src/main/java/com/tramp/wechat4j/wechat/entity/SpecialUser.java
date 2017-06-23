@@ -1,5 +1,7 @@
 package com.tramp.wechat4j.wechat.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.List;
 
 /**
@@ -7,283 +9,314 @@ import java.util.List;
  * Created by chen on 2017/6/22.
  */
 public class SpecialUser {
-    private String Alias;
-    private int AppAccountFlag;
-    private int AttrStatus;
-    private int ChatRoomId;
-    private String City;
-    private int ContactFlag;
-    private String DisplayName;
-    private String EncryChatRoomId;
-    private String HeadImgUrl;
-    private int HideInputBarFlag;
-    private int IsOwner;
-    private String KeyWord;
-    private int MemberCount;
-    private String NickName;
-    private int OwnerUin;
-    private String PYInitial;
-    private String PYQuanPin;
-    private String Province;
-    private String RemarkName;
-    private String RemarkPYInitial;
-    private String RemarkPYQuanPin;
-    private int Sex;
-    private String Signature;
-    private int SnsFlag;
-    private int StarFriend;
-    private int Statues;
-    private int Uin;
-    private int UniFriend;
-    private String UserName;
-    private int VerifyFlag;
-    private List<?> MemberList;
+    @JsonProperty("Alias")
+    private String alias;
+    @JsonProperty("AppAccountFlag")
+    private int appAccountFlag;
+    @JsonProperty("AttrStatus")
+    private int attrStatus;
+    @JsonProperty("ChatRoomId")
+    private int chatRoomId;
+    @JsonProperty("City")
+    private String city;
+    @JsonProperty("ContactFlag")
+    private int contactFlag;
+    @JsonProperty("DisplayName")
+    private String displayName;
+    @JsonProperty("EncryChatRoomId")
+    private String encryChatRoomId;
+    @JsonProperty("HeadImgUrl")
+    private String headImgUrl;
+    @JsonProperty("HideInputBarFlag")
+    private int hideInputBarFlag;
+    @JsonProperty("IsOwner")
+    private int isOwner;
+    @JsonProperty("KeyWord")
+    private String keyWord;
+    @JsonProperty("MemberCount")
+    private int memberCount;
+    @JsonProperty("NickName")
+    private String nickName;
+    @JsonProperty("OwnerUin")
+    private int ownerUin;
+    @JsonProperty("PYInitial")
+    private String pYInitial;
+    @JsonProperty("PYQuanPin")
+    private String pYQuanPin;
+    @JsonProperty("Province")
+    private String province;
+    @JsonProperty("RemarkName")
+    private String remarkName;
+    @JsonProperty("RemarkPYInitial")
+    private String remarkPYInitial;
+    @JsonProperty("RemarkPYQuanPin")
+    private String remarkPYQuanPin;
+    @JsonProperty("Sex")
+    private int sex;
+    @JsonProperty("Signature")
+    private String signature;
+    @JsonProperty("SnsFlag")
+    private int snsFlag;
+    @JsonProperty("StarFriend")
+    private int starFriend;
+    @JsonProperty("Statues")
+    private int statues;
+    @JsonProperty("Uin")
+    private int uin;
+    @JsonProperty("UniFriend")
+    private int uniFriend;
+    @JsonProperty("UserName")
+    private String userName;
+    @JsonProperty("VerifyFlag")
+    private int verifyFlag;
+    @JsonProperty("MemberList")
+    private List<?> memberList;
 
     public String getAlias() {
-        return Alias;
+        return alias;
     }
 
     public void setAlias(String alias) {
-        Alias = alias;
+        this.alias = alias;
     }
 
     public int getAppAccountFlag() {
-        return AppAccountFlag;
+        return appAccountFlag;
     }
 
     public void setAppAccountFlag(int appAccountFlag) {
-        AppAccountFlag = appAccountFlag;
+        this.appAccountFlag = appAccountFlag;
     }
 
     public int getAttrStatus() {
-        return AttrStatus;
+        return attrStatus;
     }
 
     public void setAttrStatus(int attrStatus) {
-        AttrStatus = attrStatus;
+        this.attrStatus = attrStatus;
     }
 
     public int getChatRoomId() {
-        return ChatRoomId;
+        return chatRoomId;
     }
 
     public void setChatRoomId(int chatRoomId) {
-        ChatRoomId = chatRoomId;
+        this.chatRoomId = chatRoomId;
     }
 
     public String getCity() {
-        return City;
+        return city;
     }
 
     public void setCity(String city) {
-        City = city;
+        this.city = city;
     }
 
     public int getContactFlag() {
-        return ContactFlag;
+        return contactFlag;
     }
 
     public void setContactFlag(int contactFlag) {
-        ContactFlag = contactFlag;
+        this.contactFlag = contactFlag;
     }
 
     public String getDisplayName() {
-        return DisplayName;
+        return displayName;
     }
 
     public void setDisplayName(String displayName) {
-        DisplayName = displayName;
+        this.displayName = displayName;
     }
 
     public String getEncryChatRoomId() {
-        return EncryChatRoomId;
+        return encryChatRoomId;
     }
 
     public void setEncryChatRoomId(String encryChatRoomId) {
-        EncryChatRoomId = encryChatRoomId;
+        this.encryChatRoomId = encryChatRoomId;
     }
 
     public String getHeadImgUrl() {
-        return HeadImgUrl;
+        return headImgUrl;
     }
 
     public void setHeadImgUrl(String headImgUrl) {
-        HeadImgUrl = headImgUrl;
+        this.headImgUrl = headImgUrl;
     }
 
     public int getHideInputBarFlag() {
-        return HideInputBarFlag;
+        return hideInputBarFlag;
     }
 
     public void setHideInputBarFlag(int hideInputBarFlag) {
-        HideInputBarFlag = hideInputBarFlag;
+        this.hideInputBarFlag = hideInputBarFlag;
     }
 
     public int getIsOwner() {
-        return IsOwner;
+        return isOwner;
     }
 
     public void setIsOwner(int isOwner) {
-        IsOwner = isOwner;
+        this.isOwner = isOwner;
     }
 
     public String getKeyWord() {
-        return KeyWord;
+        return keyWord;
     }
 
     public void setKeyWord(String keyWord) {
-        KeyWord = keyWord;
+        this.keyWord = keyWord;
     }
 
     public int getMemberCount() {
-        return MemberCount;
+        return memberCount;
     }
 
     public void setMemberCount(int memberCount) {
-        MemberCount = memberCount;
+        this.memberCount = memberCount;
     }
 
     public String getNickName() {
-        return NickName;
+        return nickName;
     }
 
     public void setNickName(String nickName) {
-        NickName = nickName;
+        this.nickName = nickName;
     }
 
     public int getOwnerUin() {
-        return OwnerUin;
+        return ownerUin;
     }
 
     public void setOwnerUin(int ownerUin) {
-        OwnerUin = ownerUin;
+        this.ownerUin = ownerUin;
     }
 
-    public String getPYInitial() {
-        return PYInitial;
+    public String getpYInitial() {
+        return pYInitial;
     }
 
-    public void setPYInitial(String PYInitial) {
-        this.PYInitial = PYInitial;
+    public void setpYInitial(String pYInitial) {
+        this.pYInitial = pYInitial;
     }
 
-    public String getPYQuanPin() {
-        return PYQuanPin;
+    public String getpYQuanPin() {
+        return pYQuanPin;
     }
 
-    public void setPYQuanPin(String PYQuanPin) {
-        this.PYQuanPin = PYQuanPin;
+    public void setpYQuanPin(String pYQuanPin) {
+        this.pYQuanPin = pYQuanPin;
     }
 
     public String getProvince() {
-        return Province;
+        return province;
     }
 
     public void setProvince(String province) {
-        Province = province;
+        this.province = province;
     }
 
     public String getRemarkName() {
-        return RemarkName;
+        return remarkName;
     }
 
     public void setRemarkName(String remarkName) {
-        RemarkName = remarkName;
+        this.remarkName = remarkName;
     }
 
     public String getRemarkPYInitial() {
-        return RemarkPYInitial;
+        return remarkPYInitial;
     }
 
     public void setRemarkPYInitial(String remarkPYInitial) {
-        RemarkPYInitial = remarkPYInitial;
+        this.remarkPYInitial = remarkPYInitial;
     }
 
     public String getRemarkPYQuanPin() {
-        return RemarkPYQuanPin;
+        return remarkPYQuanPin;
     }
 
     public void setRemarkPYQuanPin(String remarkPYQuanPin) {
-        RemarkPYQuanPin = remarkPYQuanPin;
+        this.remarkPYQuanPin = remarkPYQuanPin;
     }
 
     public int getSex() {
-        return Sex;
+        return sex;
     }
 
     public void setSex(int sex) {
-        Sex = sex;
+        this.sex = sex;
     }
 
     public String getSignature() {
-        return Signature;
+        return signature;
     }
 
     public void setSignature(String signature) {
-        Signature = signature;
+        this.signature = signature;
     }
 
     public int getSnsFlag() {
-        return SnsFlag;
+        return snsFlag;
     }
 
     public void setSnsFlag(int snsFlag) {
-        SnsFlag = snsFlag;
+        this.snsFlag = snsFlag;
     }
 
     public int getStarFriend() {
-        return StarFriend;
+        return starFriend;
     }
 
     public void setStarFriend(int starFriend) {
-        StarFriend = starFriend;
+        this.starFriend = starFriend;
     }
 
     public int getStatues() {
-        return Statues;
+        return statues;
     }
 
     public void setStatues(int statues) {
-        Statues = statues;
+        this.statues = statues;
     }
 
     public int getUin() {
-        return Uin;
+        return uin;
     }
 
     public void setUin(int uin) {
-        Uin = uin;
+        this.uin = uin;
     }
 
     public int getUniFriend() {
-        return UniFriend;
+        return uniFriend;
     }
 
     public void setUniFriend(int uniFriend) {
-        UniFriend = uniFriend;
+        this.uniFriend = uniFriend;
     }
 
     public String getUserName() {
-        return UserName;
+        return userName;
     }
 
     public void setUserName(String userName) {
-        UserName = userName;
+        this.userName = userName;
     }
 
     public int getVerifyFlag() {
-        return VerifyFlag;
+        return verifyFlag;
     }
 
     public void setVerifyFlag(int verifyFlag) {
-        VerifyFlag = verifyFlag;
+        this.verifyFlag = verifyFlag;
     }
 
     public List<?> getMemberList() {
-        return MemberList;
+        return memberList;
     }
 
     public void setMemberList(List<?> memberList) {
-        MemberList = memberList;
+        this.memberList = memberList;
     }
 }

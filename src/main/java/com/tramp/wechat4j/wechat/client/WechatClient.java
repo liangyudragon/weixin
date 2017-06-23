@@ -20,6 +20,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.tramp.wechat4j.wechat.bot.TuringQueryService;
 import com.tramp.wechat4j.wechat.callback.MessageCallback;
+import com.tramp.wechat4j.wechat.contants.Contants;
 import com.tramp.wechat4j.wechat.entity.*;
 import com.tramp.wechat4j.wechat.enums.*;
 import com.tramp.wechat4j.wechat.utils.*;
@@ -46,7 +47,6 @@ public class WechatClient {
     private HttpClientUtil httpClientUtil = new HttpClientUtil();
     private MessageCallback messageCallback;
     //private String qrPath = "C:\\Users\\chenjm1\\Desktop";
-    private String qrPath = "C:\\Users\\chen\\Desktop";
     boolean alive = false;
     private int memberCount = 0;
     private String userName;
@@ -72,6 +72,10 @@ public class WechatClient {
     String hotReloadDir = "itchat.pkl";
     int receivingRetryCount = 5;
     private long lastNormalRetcodeTime; // 最后一次收到正常retcode的时间，秒为单位
+
+    public WechatClient() {
+        System.setProperty("jsse.enableSNIExtension", "false"); // 防止SSL错误
+    }
 
     public WechatClient(final MessageCallback callback) {
         if (callback != null) {
@@ -104,7 +108,7 @@ public class WechatClient {
                 }
             }
             LOG.info("2. 获取登陆二维码图片");
-            if (this.getQR()) {
+            if (this.getQR(Contants.QRPATH,"QR")) {
                 LOG.info("3. 请扫描二维码图片，并在手机上确认");
                 if (!this.alive) {
                     if (wLogin()) {
@@ -155,7 +159,7 @@ public class WechatClient {
      *
      * @return
      */
-    private String getUuid() {
+    public String getUuid() {
         // 组装参数和URL
         List<BasicNameValuePair> params = Lists.newArrayList();
         params.add(new BasicNameValuePair(UUIDParaEnum.APP_ID.para(), UUIDParaEnum.APP_ID.value()));
@@ -185,8 +189,8 @@ public class WechatClient {
      *
      * @return
      */
-    public boolean getQR() {
-        qrPath = qrPath + File.separator + "QR.jpg";
+    public boolean getQR(String path,String qrName) {
+        String qrPath = path+ File.separator + qrName;
         String qrUrl = URLEnum.QRCODE_URL.getUrl() + this.uuid;
         HttpEntity entity = httpClientUtil.doGet(qrUrl, null, true, null);
         try {
@@ -258,7 +262,7 @@ public class WechatClient {
      * @author https://github.com/yaphone
      * @date 2017年4月9日 下午12:16:26
      */
-    private void processLoginInfo(String loginContent) {
+    public void processLoginInfo(String loginContent) {
         String regEx = "window.redirect_uri=\"(\\S+)\";";
         Matcher matcher = CommonTools.getMatcher(regEx, loginContent);
         if (matcher.find()) {
@@ -407,15 +411,6 @@ public class WechatClient {
         });
         return possibleUrlMap;
     }
-
-    public String getQrPath() {
-        return qrPath;
-    }
-
-    public void setQrPath(String qrPath) {
-        this.qrPath = qrPath;
-    }
-
     public boolean isAlive() {
         return alive;
     }
@@ -589,6 +584,9 @@ public class WechatClient {
         this.messageCallback = messageCallback;
     }
 
+    public String getUid(){
+        return this.uuid;
+    }
     public static void main(String[] args) {
        final Map<String,WechatClient> clientMap = Maps.newHashMap();
 

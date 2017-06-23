@@ -45,5 +45,32 @@
 <!-- 引入当前页面js文件 -->
 <script type="text/javascript" src="<%=basePath%>/resources/backstage/js/common.js"></script>
 <script type="text/javascript" src="<%=basePath%>/resources/backstage/js/main.js"></script>
+<div>微信登录二维码</div>
+<img src="<%=basePath%>/${qrPath}" alt="">
+<script type="text/javascript">
+	$(function () {
+	    if ('${loginFlag}'==1){
+            window.location.href="wechat/info.do";
+            return;
+        }
+        $.ajax({
+            type:'post',
+            url:'wechat/login.do',
+            dataType:'json',//服务器返回的数据类型
+            success:function(data){
+                if(data){
+                    window.location.href="wechat/info.do";
+                }else{
+                    layer.msg("登录失败");
+                    //changeImage();
+                }
+            },
+            error:function(){
+                //changeImage();
+            }
+        });
+    });
+
+</script>
 </body>
 </html>
